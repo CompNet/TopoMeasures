@@ -2,7 +2,7 @@ TopoMeasures
 =======
 *Partition comparison measures modified for community detection*
 
-* Copyright 2015-16 Alexandre Reiffers & Vincent Labatut. 
+* Copyright 2012-15 Vincent Labatut. 
 
 TopoMeasures is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation. For source availability and license information see `licence.txt`
 
@@ -13,7 +13,7 @@ TopoMeasures is free software: you can redistribute it and/or modify it under th
 -----------------------------------------------------------------------
 
 # Description
-Work in progress!
+Work in progress! Do not use yet!
 
 # Organization
 

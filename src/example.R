@@ -59,9 +59,9 @@ measures <- c("MODULARITY",
 		"TOPO_NORM_MUT_INF_BOTH"
 )
 for(measure in measures)
-{	x <- process_performance_metric(g=g, partition=ref, reference=ref, perfname=measure)
-	y <- process_performance_metric(g=g, partition=est1, reference=ref, perfname=measure)
-	z <- process_performance_metric(g=g, partition=est2, reference=ref, perfname=measure)
+{	x <- process.performance.metric(g=g, partition=ref, reference=ref, perfname=measure)
+	y <- process.performance.metric(g=g, partition=est1, reference=ref, perfname=measure)
+	z <- process.performance.metric(g=g, partition=est2, reference=ref, perfname=measure)
 	cat(measure,": ","R=",x," E1=",y," E2=",z,"\n",sep="")
 }
 
