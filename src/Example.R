@@ -1,11 +1,7 @@
-#setwd("c:/eclipse/workspaces/Networks")
-setwd("~/eclipse/workspaces/Networks")
+#setwd("c:/eclipse/workspaces/Networks/TopoMeasures")
+# setwd("~/eclipse/workspaces/Networks/TopoMeasures")
+# source("src/Example.R")
 
-#source("c:/Documents and Settings/Vincent/Mes documents/Travail/Ecrits/Networks Analysis/Papiers/2012.3.MARAMI12 extended/_1.scripts/figure1.R")
-#source("c:/Eclipse/workspaces/Networks/CommunityDetection/performances/processing.R")
-source("CommunityDetection/performances/processing.R")
-
-#source("Process/example.R")
 
 library(igraph)
 
