@@ -1,100 +1,47 @@
-#####################################################################
+############################################################################
 # Functions used in the processing of more than one measure.
-#####################################################################
+############################################################################
 # main lib, used to represent and process graphs
 library("igraph")
 
 
 
 
-# processes the confusion matrix for two partitions, i.e. the matrix whose cell (i,j) contains
-# the number of instances estimated to belong to community i when they actually belong to community j.
-# TODO DONE
-process.confusion.matrix <- function(part1, part2, remove.singles=FALSE)
-{	#cat("part1:\n");print(part1)
-	#cat("part2:\n");print(part2)
-	
-	# init
-	num.row <- max(part1)
-	num.col <- max(part2)
-	elt.nbr <- num.row*num.col
-	#cat("dimensions: ",num.row,"x",num.col,"=",elt.nbr,"\n",sep="")
-	
-	# TODO dirty workaround for when there're too many single communities,
-	# resulting in a too large confusion matrix.
-	# we simply merge as many single communities as needed to get
-	# a matrix R can handle.
-	if(elt.nbr > .Machine$integer.max || remove.singles)
-	{	# select the input vector with highest community count
-		part <- NULL
-		if(num.row > num.col)
-		{	part <- part1
-			lim <- num.col
-		}
-		else
-		{	part <- part2
-			lim <- num.row
-		}
-		# process how many coms should be removed
-		#excess <- elt.nbr - .Machine$integer.max
-		# get the single coms
-		t <- table(part)
-		singles <- sort(which(t==1))
-		if(length(singles)>0)
-		{	#nbr.removed <- min(excess%/%lim+1,length(singles)-1)
-			#last.single.index <- length(singles) - nbr.removed
-			#last.single <- singles[last.single.index]
-			#temp <- as.list(singles[(last.single.index+1):length(singles)])
-			nbr.removed <- length(singles) - 1
-			last.single <- singles[1]
-			temp <- as.list(singles[2:length(singles)])
-			sapply(temp,function(x)
-					{	#cat(x,"/",max(singles),"\n")
-						part[part==x] <<- last.single
-					})
-			# renumber communities
-			old.coms <- sort(unique(part))
-			indices <- as.list(1:length(old.coms))
-			sapply(indices,function(index)
-					{	#cat(index,"/",length(old.coms),": old com ",old.coms[index]," -> new com ",index,"\n",sep="")
-						if(old.coms[index] != index)
-							part[part==old.coms[index]] <<- index
-					})
-		}
-		if(num.row > num.col)
-			part1 <- part
-		else
-			part2 <- part
-		
-		num.row <- max(part1)
-		num.col <- max(part2)
-		elt.nbr <- num.row*num.col
-		#cat("new dimensions: ",num.row,"x",num.col,"=",elt.nbr,"\n",sep="")
-	}
-	
-	# process the matrix manually
-#	conf.matrix <- matrix(0,nrow=num.row,ncol=num.col)
-#	for(i in 1:length(part1))
-#	{	row <- part1[i]
-#		col <- part2[i]
-#		conf.matrix[row,col] <- conf.matrix[row,col] + 1
-#	}
-	
-	
-	# more efficient: use the standard 'table' function
-	# note: some rows/cols can be missing if they don't appear in at least one part
-	conf.matrix <- as.matrix(table(part1,part2)) 
-	
-	return(conf.matrix);
+############################################################################
+# Processes the confusion matrix for the specified partitions, i.e. the matrix 
+# whose cell (i,j) contains the number of elements belonging to part #i in 
+# partition #1 and to part #j in partition #2.
+# 
+# partition1: the first partition to consider, represented as an integer vector.
+#			  Each value in the vector represents the id of a part. The parts 
+#			  must be counted starting from one (not zero).
+# partition2: the second partition to consider. Same representation than for
+#			  the first one. Both are inter-exchangeable (symmetric measure).
+# returns: the confusion matrix, a.k.a. contingency table
+############################################################################
+process.confusion.matrix <- function(part1, part2)
+{	p1 <- factor(part1, levels=1:max(part1))
+	p2 <- factor(part2, levels=1:max(part2))
+	result <- as.matrix(table(p1,p2))
+	return(result)
 }
 
 
 
-# processes the pairwise matrix for two partitions, i.e. the matrix whose cells contain:
-#	- (0,0): number of pairs of instances classified in the same community by both methods
-#	- (1,1): number of pairs of instances classified in different communities by both methods
-#	- (0,1),(1.0): number of pairs of instances classified in different communities by one method, and in the same by the other
-# TODO DONE
+############################################################################
+# Processes the pairwise comparison matrix for the specified partitions, i.e. 
+# the 2x2 matrix containing the following values:
+#	- (1,1): number of pairs of elements belonging to the same part in both partitions.
+#	- (2,2): number of pairs of elements belonging to different parts in both partitions.
+#	- (1,2),(2,1): number of pairs of elements belonging to different parts in one partition, 
+#				   and to the same part in the other.
+#
+# partition1: the first partition to consider, represented as an integer vector.
+#			  Each value in the vector represents the id of a part. The parts 
+#			  must be counted starting from one (not zero).
+# partition2: the second partition to consider. Same representation than for
+#			  the first one. Both are inter-exchangeable (symmetric measure).
+############################################################################
 process.pairwise.matrix <- function(part1, part2)
 {	# init
 	result <- matrix(0,nrow=2,ncol=2)
@@ -106,75 +53,30 @@ process.pairwise.matrix <- function(part1, part2)
 			if(part1[i]==part1[j])
 			{	if(part2[i]==part2[j])
 				{	# both the same
-					#cat("both same\n")				
+					#cat("same-same\n")				
 					result[1,1] <- result[1,1] + 1
 				}
 				else
 				{	# the same for est., different for ref.
-					#cat("same diff\n")				
+					#cat("same-diff\n")				
 					result[1,2] <- result[1,2] + 1
 				}
 			}
 			else
 			{	if(part2[i]==part2[j])
 				{	# different for est., the same for ref.
-					#cat("diff same\n")				
+					#cat("diff-same\n")				
 					result[2,1] <- result[2,1] + 1
 				}
 				else
 				{	# different for both
-					#cat("both diff\n")				
+					#cat("diff-diff\n")				
 					result[2,2] <- result[2,2] + 1
 				}
 			}
 		}
 	}
 	
-	return(result);
-}
-
-
-
-# processes the percent of correctly classified nodes for the specified partitions
-# it identifies similar communities by selecting the max confusion matrix cell (i,j):
-# then estimated community i is supposed to correspond to actual community class j.
-# this may not be the best way...
-# TODO DONE
-process.percent.correct<-function(reference, estimation, remove.singles=FALSE)
-{	# process the confusion matrix
-	conf.matrix <- process.confusion.matrix(reference,estimation,remove.singles);
-	#print(conf.matrix)
-	
-	norm <- sum(conf.matrix)
-	inter.nbr <- min(dim(conf.matrix))
-	#cat("norm:",norm,"\n")
-	#cat("inter.nbr:",inter.nbr,"\n")
-	#cat("dim:",dim(conf.matrix),"\n")
-	
-	# match the communities
-	ref.used <- c();
-	est.used <- c();
-	total <- 0;
-	val <- 1
-	i <- 1
-	while(i<=inter.nbr && val>0)
-	{	#cat("percent.correct: ",i,"/",inter.nbr,"\n",sep="")
-		mx <- get.max.mat(conf.matrix)
-		val <- conf.matrix[mx[1],mx[2]]
-		#cat("i:",i," val:",val," mx:",mx,"\n")
-		if(val>0)
-		{	if(is.na(get.last.position(mx[1],ref.used)) && is.na(get.last.position(mx[2],est.used)))
-			{	ref.used <- c(ref.used,mx[1])
-				est.used <- c(est.used,mx[2])
-				total <- total + conf.matrix[mx[1],mx[2]]
-			}
-			conf.matrix[mx[1],mx[2]] <- 0
-			i <- i + 1
-		}
-	}
-	
-	# process final result
-	result <- total/norm;
 	return(result);
 }
 
