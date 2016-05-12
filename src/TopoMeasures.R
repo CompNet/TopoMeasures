@@ -2,10 +2,12 @@
 # these functions are related to the processing of performance measures
 # (in the context of community detection)
 # source("CommunityDetection/performances/processing.R")
+#
+# Vincent Labatut 2012-16
 ############################################################################
 
 #library("mclust") #TODO is this really needed ?
-
+#TODO must weights be normalized?
 
 
 

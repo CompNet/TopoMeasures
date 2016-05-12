@@ -1,5 +1,7 @@
 ############################################################################
 # Functions used to process the purity measure and its variants.
+#
+# Vincent Labatut 2012-16
 ############################################################################
 # get the common functions
 source("src/CommonFunctions.R")
@@ -38,6 +40,7 @@ process.percent.correct<-function(partition1, partition2)
 	# init
 	total <- 0
 	norm <- sum(conf.matrix)
+	conf.matrix <- conf.matrix / norm
 	
 	# match the communities
 	while(nrow(conf.matrix)>0 && ncol(conf.matrix)>0)
@@ -50,8 +53,7 @@ process.percent.correct<-function(partition1, partition2)
 	}
 	
 	# process final result
-	result <- total/norm
-	return(result)
+	return(total)
 }
 
 
@@ -90,7 +92,7 @@ process.percent.correct<-function(partition1, partition2)
 # partition2: the second partition to consider. Same representation than for
 #			  the first one. Both are inter-exchangeable (symmetric measure).
 # no.merge: if TRUE, applies Newman's stricter version of the measure.
-# returns: a signle real value between 0 and 1 indicating the purity of the first
+# returns: a single real value between 0 and 1 indicating the purity of the first
 #		   partition relatively to the second.
 ############################################################################
 process.purity <- function(partition1, partition2, no.merge=FALSE)
@@ -98,25 +100,25 @@ process.purity <- function(partition1, partition2, no.merge=FALSE)
 	conf.matrix <- process.confusion.matrix(partition2,partition1)
 	
 	# init
+	total <- 0
 	norm <- sum(conf.matrix)
+	conf.matrix <- conf.matrix / norm
 	corresp <- rep(0,nrow(conf.matrix))
 	
 	# for each part in partition1, identify the corresponding parts in partition2
-	# i.e. those with the largest interesection (there can be several)
+	# i.e. those with the largest intersection (there can be several)
 	for(r in 1:nrow(conf.matrix))
 		corresp[r] <- which.max(conf.matrix[r,])
 	
 	# identify and count the correctly classified nodes
-	correct <- 0
 	for(c in 1:ncol(conf.matrix))
 	{	indices <- which(corresp==c)
 		# possibly ignore merged communities
 		if(length(indices)==1 || !no.merge)
-			correct <- correct + sum(conf.matrix[indices,c])
+			total <- total + sum(conf.matrix[indices,c])
 	}
 	
-	result <- correct / norm
-	return(result)
+	return(total)
 }
 
 
@@ -136,37 +138,33 @@ process.purity <- function(partition1, partition2, no.merge=FALSE)
 #			  the first one. Both are inter-exchangeable (symmetric measure).
 # no.merge: if TRUE, applies Newman's stricter version of the measure.
 # topo.measure: numerical vector representing the topological weight associated
-#				to each node. So, its length must the same than vectors partition1 
+#				to each node. So, its length must be the same than vectors partition1 
 # 				and partition2.
-# returns: a signle real value between 0 and 1 indicating the purity of the first
+# returns: a single real value between 0 and 1 indicating the purity of the first
 #		   partition relatively to the second.
 ############################################################################
 process.topological.purity <- function(partition1, partition2, topo.measure, no.merge=FALSE)
 {	# process the confusion matrix
-	conf.matrix <- process.confusion.matrix(partition2,partition1)
+	conf.matrix <- process.weighted.confusion.matrix(partition2,partition1,topo.measure)
 	
 	# init
-	norm <- sum(topo.measure)
+	total <- 0
+	norm <- sum(conf.matrix)
+	conf.matrix <- conf.matrix / norm
 	corresp <- rep(0,nrow(conf.matrix))
 	
-	# for each reference community, identify the corresponding estimated community
+	# for each part in partition1, identify the corresponding parts in partition2
+	# i.e. those with the largest intersection (there can be several)
 	for(r in 1:nrow(conf.matrix))
 		corresp[r] <- which.max(conf.matrix[r,])
 	
-	# identify and count the correctly classified nodes (weighted by topo.measure)
-	correct <- 0
-	correct.vect <- rep(NA,length(partition1))
-	for(v in 1:length(partition1))
-	{	indices <- which(corresp==partition2[v])
-		if(partition1[v] %in% indices && (length(indices)==1 || !no.merge))
-		{	correct <- correct + topo.measure[v]
-			correct.vect[v] <- TRUE
-		}
-		else
-		{	correct.vect[v] <- FALSE
-		}
+	# identify and count the correctly classified nodes
+	for(c in 1:ncol(conf.matrix))
+	{	indices <- which(corresp==c)
+		# possibly ignore merged communities
+		if(length(indices)==1 || !no.merge)
+			total <- total + sum(conf.matrix[indices,c])
 	}
 	
-	result <- correct / norm
-	return(result)
+	return(total)
 }
