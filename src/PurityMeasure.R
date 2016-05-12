@@ -1,50 +1,118 @@
-#####################################################################
+############################################################################
 # Functions used to process the purity measure and its variants.
-#####################################################################
+############################################################################
+# get the common functions
+source("src/CommonFunctions.R")
 
 
 
 
-
-
-# like process.percent.correct, except it includes the
-# variant by newman, in which if two reference communities
-# correspond to the same estimated community, then all nodes
-# are considered as misclassified (option no.merge).
-# Newman uses the inverted version of the measure, i.e. he
-# considers the purity of real communities (instead of the estimated ones)
-process.purity <- function(reference, estimation, inverted=FALSE, remove.singles=FALSE, no.merge=FALSE)
-{	# possibly invert the vectors
-	if(inverted)
-	{	temp <- reference
-		reference <- estimation
-		estimation <- temp
-	}	
+############################################################################
+# Processes the proportion of similarly classified elements for the specified 
+# partitions.
+# 
+# In order to identify similar parts in two distinct partitions, the function
+# selects the cell (i,j) of the confusion matrix which has the maximal value:
+# part #i in partition #1 is supposed to correspond to part #j in partition #2.
+# Then, all remaining values in row #i and column #j are discarded (since the
+# association has been set, and we look for a 1-to-1 mapping). We go one similarly
+# with the rest of the matrix, until there is no more value to process. If the
+# numbers of parts are different in the two considered partitions, the smallest
+# parts of the larger partition will be left over (i.e. no mapping for them).
+#
+# This measure is found quite commonly in the cluster analysis literature, and
+# in the early community detection works. 
+#
+# partition1: the first partition to consider, represented as an integer vector.
+#			  Each value in the vector represents the id of a part. The parts 
+#			  must be counted starting from one (not zero).
+# partition2: the second partition to consider. Same representation than for
+#			  the first one. Both are inter-exchangeable (symmetric measure).
+# returns: a single real value between 0 and 1 indicating the proportion of elements
+#		   put on the same part in both partitions.
+############################################################################
+process.percent.correct<-function(partition1, partition2)
+{	# process the confusion matrix
+	conf.matrix <- process.confusion.matrix(partition1,partition2)
 	
-	# process the confusion matrix
-	conf.matrix <- process.confusion.matrix(estimation,reference,remove.singles)
-	#print(dim(conf.matrix))
-	#print(conf.matrix)
+	# init
+	total <- 0
+	norm <- sum(conf.matrix)
+	
+	# match the communities
+	while(nrow(conf.matrix)>0 && ncol(conf.matrix)>0)
+	{	# get the position of the maximal value in the whole matrix
+		mx <- which(conf.matrix == max(conf.matrix), arr.ind = TRUE)
+		# add to score
+		total <- total + conf.matrix[mx[1,1],mx[1,2]]
+		# remove corresponding row & col
+		conf.matrix <- conf.matrix[-mx[1,1],-mx[1,2],drop=FALSE]
+	}
+	
+	# process final result
+	result <- total/norm
+	return(result)
+}
+
+
+
+############################################################################
+# A variant of the percent correct measure defined above, but this one is
+# not symmetric: the first partition is compared to the second (which, here,
+# is different from the opposite). 
+# 
+# For each part in partition #1, we look for the part in partition #2 with the
+# largest intersection. These are considered to be matched. We discard them (both
+# corresponding row and column are removed from the confusion matrix) and repeat 
+# the same process until there is no more row to process.
+#
+# In Newman's stricter variant, which is activated by setting the no.merge option 
+# to TRUE, if one part from partition #2 maximally intersects several parts from 
+# partition #1, then *all* its elements are considered as misclassified.
+#		Newman, M. E. J. 
+#		Fast algorithm for detecting community structure in networks 
+#		Physical Review E, 69:066133, 2004
+#		http://pre.aps.org/abstract/PRE/v69/i6/e066133
+# Also, note that in its seminal paper, Newman assesses the purity of the ground-
+# truth partition relatively to the partition estimated by the considered community 
+# detection algorithm.
+#		Girvan, M. & Newman, M. E. J. 
+#		Community structure in social and biological networks 
+#		Proceedings of the National Academy of Sciences, 99:7821-7826, 2002
+#		http://www.pnas.org/content/99/12/7821.abstract
+# Most authors chose to do the opposite (i.e. estimated partition compared to 
+# ground-truth), as explained in my own paper (see the README.md file for the 
+# full reference).
+#
+# partition1: the first partition to consider, represented as an integer vector.
+#			  Each value in the vector represents the id of a part. The parts 
+#			  must be counted starting from one (not zero).
+# partition2: the second partition to consider. Same representation than for
+#			  the first one. Both are inter-exchangeable (symmetric measure).
+# no.merge: if TRUE, applies Newman's stricter version of the measure.
+# returns: a signle real value between 0 and 1 indicating the purity of the first
+#		   partition relatively to the second.
+############################################################################
+process.purity <- function(partition1, partition2, no.merge=FALSE)
+{	# process the confusion matrix
+	conf.matrix <- process.confusion.matrix(partition2,partition1)
 	
 	# init
 	norm <- sum(conf.matrix)
 	corresp <- rep(0,nrow(conf.matrix))
-	#print(conf.matrix)
 	
-	# for each estimated community, identify the corresponding reference community
-	for(e in 1:nrow(conf.matrix))
-		corresp[e] <- which.max(conf.matrix[e,])
-	#print(corresp)
+	# for each part in partition1, identify the corresponding parts in partition2
+	# i.e. those with the largest interesection (there can be several)
+	for(r in 1:nrow(conf.matrix))
+		corresp[r] <- which.max(conf.matrix[r,])
 	
 	# identify and count the correctly classified nodes
 	correct <- 0
-	for(r in 1:ncol(conf.matrix))
-	{	indices <- which(corresp==r)
-		#print(indices)
+	for(c in 1:ncol(conf.matrix))
+	{	indices <- which(corresp==c)
 		# possibly ignore merged communities
 		if(length(indices)==1 || !no.merge)
-			correct <- correct + sum(conf.matrix[indices,r])
-		#cat("correct:",correct,"\n")
+			correct <- correct + sum(conf.matrix[indices,c])
 	}
 	
 	result <- correct / norm
@@ -53,67 +121,52 @@ process.purity <- function(reference, estimation, inverted=FALSE, remove.singles
 
 
 
-# variant of the purity taking topological properties
-# into account. the parameter topo.measure associates
-# some topological property to each node. this information
-# is used to determine how much the classifier must be
-# penalized in case of error.
-process.topological.purity <- function(reference, estimation, inverted=FALSE, topo.measure, remove.singles=FALSE, details=FALSE)
-{	# possibly invert the vectors
-	if(inverted)
-	{	temp <- reference
-		reference <- estimation
-		estimation <- temp
-	}
-	
-	# process the confusion matrix
-	conf.matrix <- process.confusion.matrix(estimation,reference,remove.singles)
-	#print(dim(conf.matrix))
+############################################################################
+# Modification of the Purity measure described in my paper (cf. README.md for
+# the full reference). It takes some topological information into account, in
+# order to weight differently classification mistakes depending on the network
+# position of the concerned nodes. The parameter topo.measure must a numerical
+# vector countaining as many values as there are nodes in the processed network.
+# It corresponds to the weights mentioned above.
+#
+# partition1: the first partition to consider, represented as an integer vector.
+#			  Each value in the vector represents the id of a part. The parts 
+#			  must be counted starting from one (not zero).
+# partition2: the second partition to consider. Same representation than for
+#			  the first one. Both are inter-exchangeable (symmetric measure).
+# no.merge: if TRUE, applies Newman's stricter version of the measure.
+# topo.measure: numerical vector representing the topological weight associated
+#				to each node. So, its length must the same than vectors partition1 
+# 				and partition2.
+# returns: a signle real value between 0 and 1 indicating the purity of the first
+#		   partition relatively to the second.
+############################################################################
+process.topological.purity <- function(partition1, partition2, topo.measure, no.merge=FALSE)
+{	# process the confusion matrix
+	conf.matrix <- process.confusion.matrix(partition2,partition1)
 	
 	# init
 	norm <- sum(topo.measure)
-	topo.measure <- topo.measure / norm
-	#cat("norm:",norm,"\n",ep="")
 	corresp <- rep(0,nrow(conf.matrix))
 	
 	# for each reference community, identify the corresponding estimated community
-	for(e in 1:nrow(conf.matrix))
-		corresp[e] <- which.max(conf.matrix[e,])
-	#print(corresp)
+	for(r in 1:nrow(conf.matrix))
+		corresp[r] <- which.max(conf.matrix[r,])
 	
-	# identify and count the correctly classified nodes
+	# identify and count the correctly classified nodes (weighted by topo.measure)
 	correct <- 0
-	correctness <- rep(NA,length(reference))
-	for(i in 1:length(reference))
-	{	#cat("estimation:",estimation[i],"\n")
-		#cat("reference:",reference[i],"\n")
-		corres <- corresp[estimation[i]]
-		#cat("corres:",corres,"\n")
-		if(!is.na(corres) && reference[i]==corres)
-		{	correct <- correct + topo.measure[i]
-			#cat("correct:",topo.measure[i],"\n",sep="")
-			correctness[i] <- 1
+	correct.vect <- rep(NA,length(partition1))
+	for(v in 1:length(partition1))
+	{	indices <- which(corresp==partition2[v])
+		if(partition1[v] %in% indices && (length(indices)==1 || !no.merge))
+		{	correct <- correct + topo.measure[v]
+			correct.vect[v] <- TRUE
 		}
 		else
-		{	#cat("INcorrect:",topo.measure[i],"\n",sep="")
-			correctness[i] <- 0
+		{	correct.vect[v] <- FALSE
 		}
 	}
 	
-	if(details)
-		result <- correctness
-	else
-		result <- correct
-	#cat("correct.old:",correct.old/length(estimation),"\n")
-	#cat("purity",process.purity(reference, estimation, inverted),"\n")
-	#cat("percent.correct",process.percent.correct(reference,estimation),"\n")
-	#cat("result:",result,"\n")
-	#cat("xxxxxxxxxxxxxxxxxxxxxx\n")
-	#print(correctness)
+	result <- correct / norm
 	return(result)
-	
-# tests	
-#	conf.matrix <- matrix(c(12,2,3,5,16,8,9,3,20,5,6,18),ncol=4)
-#	reference <- c(1,1,1,1,1,1,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4)
-#	estimation <- c(1,1,1,1,2,3,1,2,2,2,2,2,3,1,2,3,3,3,3,3,3,1,2,3,3,3,3,3,3,3)
 }

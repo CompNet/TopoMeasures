@@ -1,6 +1,8 @@
-#####################################################################
+############################################################################
 # Functions used to process the normalized mutual information and its variants.
-#####################################################################
+############################################################################
+# get the common functions
+source("src/CommonFunctions.R")
 
 
 
@@ -18,27 +20,27 @@ process.NMI <- function(part1, part2, remove.singles=FALSE)
 	s.col <- colSums(conf.matrix)
 	
 	# process normalized mutual information measure
-	sum1 <- 0;
+	sum1 <- 0
 	for(i in 1:num.row)
 	{	for(j in 1:num.col)
 		{	temp <- conf.matrix[i,j] * log2((conf.matrix[i,j]*n) / (s.row[i]*s.col[j]))
 			if(!is.na(temp))
-				sum1 <- sum1 + temp;
+				sum1 <- sum1 + temp
 		}
 	}
 	
-	sum2 <- 0;
+	sum2 <- 0
 	for(i in 1:num.row)
 	{	temp <- s.row[i]*log2(s.row[i]/n)
 		if(!is.na(temp))
-			sum2 <- sum2 + temp;
+			sum2 <- sum2 + temp
 	}
 	
-	sum3 <- 0;
+	sum3 <- 0
 	for(j in 1:num.col)
 	{	temp <- s.col[j]*log2(s.col[j]/n)
 		if(!is.na(temp))
-			sum3 <- sum3 + temp;
+			sum3 <- sum3 + temp
 	}
 	
 	# combine all the parts...
@@ -69,27 +71,27 @@ process.topological.NMI <- function(part1, part2, topo.measure, remove.singles=F
 	s.col <- colSums(conf.matrix)
 	
 	# process normalized mutual information measure
-	sum1 <- 0;
+	sum1 <- 0
 	for(i in 1:num.row)
 	{	for(j in 1:num.col)
 		{	temp <- conf.matrix[i,j] * log2((conf.matrix[i,j]) / (s.row[i]*s.col[j]))
 			if(!is.na(temp))
-				sum1 <- sum1 + temp;
+				sum1 <- sum1 + temp
 		}
 	}
 	
-	sum2 <- 0;
+	sum2 <- 0
 	for(i in 1:num.row)
 	{	temp <- s.row[i]*log2(s.row[i])
 		if(!is.na(temp))
-			sum2 <- sum2 + temp;
+			sum2 <- sum2 + temp
 	}
 	
-	sum3 <- 0;
+	sum3 <- 0
 	for(j in 1:num.col)
 	{	temp <- s.col[j]*log2(s.col[j])
 		if(!is.na(temp))
-			sum3 <- sum3 + temp;
+			sum3 <- sum3 + temp
 	}
 	
 	# combine all the parts...

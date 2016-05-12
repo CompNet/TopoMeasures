@@ -1,6 +1,6 @@
-#####################################################################
+############################################################################
 # Functions used to process the Rand index and its variants.
-#####################################################################
+############################################################################
 # fast implementation of the Rand index and its adjusted version
 library("flexclust") 
 
@@ -13,17 +13,19 @@ source("src/CommonFunctions.R")
 # the rand index is nothing but the percent correct 
 # processed on the pairwise matrix
 # TODO DONE
-process.rand.index<-function(part1, part2)
-{	#mat <- process.pairwise.matrix(part1,part2)
-	#result <- (mat[1,1]+mat[2,2]) / sum(mat)
-	#cat(paste("RI: original=",result,sep=""))
-	
-	# more efficient
-	#conf.matrix <- process.confusion.matrix(part1,part2)
-	#result <- randIndex(conf.matrix,correct=FALSE)
-	result <- randIndex(as.integer(part1),as.integer(part2),correct=FALSE)
-	#cat(paste("new=",result,"\n",sep=""))
-	
+process.rand.index <- function(partition1, partition2)
+{	result <- randIndex(as.integer(partition1),as.integer(partition2),correct=FALSE)
+	return(result)
+}
+
+
+
+# processes the adjusted rand index for the specified partitions
+# the rand index is nothing but the Cohen's Kappa statistic 
+# processed on the pairwise matrix
+# TODO DONE
+process.adjusted.rand.index<-function(partition1, partition2)
+{	result <- randIndex(as.integer(partition1),as.integer(partition2),correct=TRUE)
 	return(result)
 }
 
@@ -100,22 +102,6 @@ process.topological.rand.index<-function(part1, part2, topo.measure)
 	
 	result <- (mat[1,1]+mat[2,2]) / sum(mat)
 	#cat(paste("RI: original=",result,sep=""))
-	
-	return(result)
-}
-
-
-
-
-# processes the adjusted rand index for the specified partitions
-# the rand index is nothing but the Cohen's Kappa statistic 
-# processed on the pairwise matrix
-# TODO DONE
-process.adjusted.rand.index<-function(part1, part2)
-{	#conf.matrix <- process.confusion.matrix(part1,part2);
-	#result <- randIndex(conf.matrix,correct=TRUE)
-	result <- randIndex(as.integer(part1),as.integer(part2),correct=TRUE)
-	#cat(paste("new=",result,"\n",sep=""))
 	
 	return(result)
 }

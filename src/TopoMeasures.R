@@ -1,8 +1,8 @@
-######################################################################
+############################################################################
 # these functions are related to the processing of performance measures
 # (in the context of community detection)
 # source("CommunityDetection/performances/processing.R")
-######################################################################
+############################################################################
 
 #library("mclust") #TODO is this really needed ?
 
@@ -122,5 +122,5 @@ process.performance.metric <- function(g=NA, partition, reference, perfname, rem
 		result <- process.topological.NMI(part1=reference, part2=partition, 
 				topo.measure=degree(g)/max(degree(g))*embeddedness(g,reference), remove.singles)
 	
-	return(result);
+	return(result)
 }

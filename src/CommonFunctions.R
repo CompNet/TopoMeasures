@@ -77,7 +77,7 @@ process.pairwise.matrix <- function(part1, part2)
 		}
 	}
 	
-	return(result);
+	return(result)
 }
 
 
@@ -86,7 +86,7 @@ process.pairwise.matrix <- function(part1, part2)
 # Processes the embeddedness as defined by Lancichinetti et al. in:
 # 		Lancichinetti, A.; Kivelä, M.; Saramäki, J. & Fortunato, S. 
 #		Characterizing the Community Structure of Complex Networks 
-#		PLoS ONE, 2010, 5, e11976
+#		PLoS ONE, 5:e11976, 2010
 #		http://www.plosone.org/article/info:doi/10.1371/journal.pone.0011976
 # It is basically defined as k_{in}/k, i.e. the ratio of the internal to the
 # total degree of the considered node. The internal degree is its number of
@@ -108,7 +108,6 @@ embeddedness <- function(g, partition)
 		com1 <- partition[idx1]
 		int.deg <- 0
 		ext.deg <- 0
-		#cat("com1=",com1,"\n")
 		
 		# get the direct neighbors
 		neighs <- neighborhood(graph=g,order=1,nodes=idx1,mode="all")[[1]]
