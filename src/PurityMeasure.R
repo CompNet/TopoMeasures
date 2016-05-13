@@ -33,7 +33,7 @@ source("src/CommonFunctions.R")
 # returns: a single real value between 0 and 1 indicating the proportion of elements
 #		   put on the same part in both partitions.
 ############################################################################
-process.percent.correct<-function(partition1, partition2)
+process.percent.correct <- function(partition1, partition2)
 {	# process the confusion matrix
 	conf.matrix <- process.confusion.matrix(partition1,partition2)
 	
@@ -127,7 +127,7 @@ process.purity <- function(partition1, partition2, no.merge=FALSE)
 # Modification of the Purity measure described in my paper (cf. README.md for
 # the full reference). It takes some topological information into account, in
 # order to weight differently classification mistakes depending on the network
-# position of the concerned nodes. The parameter topo.measure must a numerical
+# position of the concerned nodes. The parameter weights must be a numerical
 # vector countaining as many values as there are nodes in the processed network.
 # It corresponds to the weights mentioned above.
 #
@@ -137,15 +137,15 @@ process.purity <- function(partition1, partition2, no.merge=FALSE)
 # partition2: the second partition to consider. Same representation than for
 #			  the first one. Both are inter-exchangeable (symmetric measure).
 # no.merge: if TRUE, applies Newman's stricter version of the measure.
-# topo.measure: numerical vector representing the topological weight associated
-#				to each node. So, its length must be the same than vectors partition1 
-# 				and partition2.
+# weights: numerical vector representing the topological weight associated
+#		  to each node. So, its length must be the same than vectors partition1 
+# 		  and partition2.
 # returns: a single real value between 0 and 1 indicating the purity of the first
 #		   partition relatively to the second.
 ############################################################################
-process.topological.purity <- function(partition1, partition2, topo.measure, no.merge=FALSE)
+process.topological.purity <- function(partition1, partition2, weights, no.merge=FALSE)
 {	# process the confusion matrix
-	conf.matrix <- process.weighted.confusion.matrix(partition2,partition1,topo.measure)
+	conf.matrix <- process.weighted.confusion.matrix(partition2,partition1,weights)
 	
 	# init
 	total <- 0

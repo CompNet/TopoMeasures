@@ -2,7 +2,7 @@
 # Functions used to process the normalized mutual information and its variants.
 # 
 # Note: the NMI is now implemented in igraph
-# 		compare(comm1=partition1, comm2=partition2, method="nmi")
+# 		compare(partition1, partition2, method="nmi")
 #
 # Vincent Labatut 2012-16
 ############################################################################
@@ -27,15 +27,15 @@ source("src/CommonFunctions.R")
 #			  must be counted starting from one (not zero).
 # partition2: the second partition to consider. Same representation than for
 #			  the first one. Both are inter-exchangeable (symmetric measure).
-# topo.measure: numerical vector representing the topological weight associated
-#				to each node. So, its length must be the same than vectors partition1 
-# 				and partition2.
+# weights: numerical vector representing the topological weight associated
+#		   to each node. So, its length must be the same than vectors partition1 
+# 		   and partition2.
 # returns: a single real value between 0 and 1 corresponding to the NMI version
 #		   used in the community detection field.
 ############################################################################
-process.topological.NMI <- function(partition1, partition2, topo.measure)
+process.topological.NMI <- function(partition1, partition2, weights)
 {	# process the confusion matrix
-	conf.matrix <- process.weighted.confusion.matrix(partition1,partition2,topo.measure)
+	conf.matrix <- process.weighted.confusion.matrix(partition1,partition2,weights)
 	
 	# init
 	norm <- sum(conf.matrix)
@@ -47,8 +47,8 @@ process.topological.NMI <- function(partition1, partition2, topo.measure)
 	
 	# process normalized mutual information measure
 	sum1 <- 0
-	for(i in 1:num.row)
-	{	for(j in 1:num.col)
+	for(i in 1:nrow(conf.matrix))
+	{	for(j in 1:ncol(conf.matrix))
 		{	temp <- conf.matrix[i,j] * log2((conf.matrix[i,j]) / (s.row[i]*s.col[j]))
 			if(!is.na(temp))
 				sum1 <- sum1 + temp
@@ -56,14 +56,14 @@ process.topological.NMI <- function(partition1, partition2, topo.measure)
 	}
 	
 	sum2 <- 0
-	for(i in 1:num.row)
+	for(i in 1:nrow(conf.matrix))
 	{	temp <- s.row[i]*log2(s.row[i])
 		if(!is.na(temp))
 			sum2 <- sum2 + temp
 	}
 	
 	sum3 <- 0
-	for(j in 1:num.col)
+	for(j in 1:ncol(conf.matrix))
 	{	temp <- s.col[j]*log2(s.col[j])
 		if(!is.na(temp))
 			sum3 <- sum3 + temp

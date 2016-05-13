@@ -78,7 +78,7 @@ process.weighted.confusion.matrix <- function(partition1, partition2, weights)
 #	  partitions.
 #	- (1,2),(2,1): number of pairs of elements belonging to different parts 
 #	  in one partition, and to the same part in the other.
-# If a weight vector is specified, then we use it instead of just counting
+# If a weights vector is specified, then we use it instead of just counting
 # the elements. Not specifying such a vector is equivalent to providing a
 # vector of 1s.
 #
@@ -103,7 +103,7 @@ process.pairwise.matrix <- function(partition1, partition2, weights=NA)
 	for(i in 1:(length(partition1)-1))
 	{	for(j in (i+1):length(partition1))
 		{	#cat("i,j:",i,",",j," 1:",part1[i],",",part1[j]," 2:",part2[i],",",part2[j],"\n")			
-			value <- topo.measure[i] * topo.measure[j]
+			value <- weights[i] * weights[j]
 			if(partition1[i]==partition1[j])
 			{	if(partition2[i]==partition2[j])
 				{	# both the same
@@ -184,5 +184,22 @@ embeddedness <- function(g, partition)
 		#cat("degree=",degree(g)[i]," estimation=",int.deg+ext.deg,"\n")		
 	}
 	
+	return(result)
+}
+
+
+
+############################################################################
+# Processes the harmonic mean of the two specified values, also called F-measure,
+# i.e.:
+#		H(x,y) = 2xy/(x+y)
+#		https://en.wikipedia.org/wiki/Harmonic_mean#Harmonic_mean_of_two_or_three_numbers
+#
+# x: first value.
+# y: second value.
+# returns: harmonic mean of x and y.
+############################################################################
+harmonic.mean <- function(x,y)
+{	result <- 2*x*y / (x+y)
 	return(result)
 }
