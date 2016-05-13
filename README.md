@@ -17,7 +17,8 @@ If you use this source code, please cite reference [L'15].
 
 # Description
 These scripts implement several measures allowing to compare two community structures, i.e. two partitions of the
-node set of a given graph. They are based on popular measures defined in the field of cluster analysis, namely:  
+node set of a given graph. They are based on popular measures defined in the field of cluster analysis, namely 
+(see the source code for original bibliographic references):  
 
 * Purity (also known under many other names in the literature, such as percent correct, accuracy, etc.)
 * Rand index and its adjusted version.
