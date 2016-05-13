@@ -5,7 +5,6 @@
 #
 # Vincent Labatut 2012-16
 ############################################################################
-
 #setwd("C:/Eclipse/workspaces/Networks/TopoMeasures")
 #setwd("~/eclipse/workspaces/Networks/TopoMeasures")
 #source("src/Example.R")
@@ -17,27 +16,87 @@ source("src/RandIndex.R")
 
 
 
+
+# set up some example partitions
+part.ref <- c(1,1,1,1,1,1,2,2,2,2)		# ground truth
+part.est <- list(
+	Algo1=c(1,1,1,1,1,2,2,2,2,2),		# estimation by algorithm #1 (paper)
+	Algo2=c(1,2,1,1,1,1,2,2,2,2),		# estimation by algorithm #2 (paper)
+	Three=c(1,1,1,2,2,2,2,3,3,3),		# three parts
+	Snglt=c(1,2,3,4,5,6,7,8,9,10),		# singletons
+	Alli1=c(1,1,1,1,1,1,1,1,1,1),		# all in one
+	Unbld=c(1,1,1,1,1,1,1,1,1,2)		# 9 vs. 1 (unbalanced)
+)
+# display these partitions
+cat("Reference partition:");print(part.ref)
+cat("Estimated partitions:\n")
+for(e in 1:length(part.est))
+{	cat("- ",names(part.est)[e],": ")
+	print(part.est[[e]])
+}
+
+
+
 # create the example graph
 g <- graph(edges=c(1,2,1,3,1,4,1,5,1,6,2,3,2,4,2,5,2,6,2,7,3,4,4,5,6,8,7,8,7,9,7,10,8,9,8,10,9,10), 
 		directed=FALSE)
-# set up some example partition
-ref <- c(1,1,1,1,1,1,2,2,2,2)		# ground truth
-est1 <- c(1,1,1,1,1,2,2,2,2,2)		# estimation by algorithm #1
-est2 <- c(1,2,1,1,1,1,2,2,2,2)		# estimation by algorithm #2
 # plot graph and ground truth
 plot(g, layout=layout.fruchterman.reingold, vertex.label=1:vcount(g)
-	,vertex.color=ref+1
+	,vertex.color=part.ref+1
 )
 
 
-# process the nodal measures later used as weights
-deg <- degree(g)
-emb <- embeddedness(g)
+
+# process the topological weights
+topo.weights <- list(
+	NormalizedDegree=degree(g)/max(degree(g)),						# normalized degree
+	Embeddedness=embeddedness(g,part.ref),							# embeddedness
+	Product=degree(g)/max(degree(g))*embeddedness(g,part.ref)		# product of normalized degree and embeddedness
+)
+for(t in 1:length(topo.weights))
+{	cat(names(topo.weights)[t],": ")
+	print(topo.weights[[t]])
+}
 
 
-# list the measures we want to process for this graph and partitions
-measures <- list(	
-	# traditional measures (no topological weight)
+
+# display confusion matrices (for debug)
+for(e in 1:length(part.est))
+{	cat(names(part.est)[e],":Refrc\n",sep="")
+	# confusion matrix
+	cat(" - Confusion matrix - unweighted:\n")
+	cm <- process.confusion.matrix(part.est[[e]],part.ref)
+	print(cm)
+	# weighted confusion matrices
+	for(t in 1:length(topo.weights))
+	{	cat(" - Confusion matrix - weights=",names(topo.weights)[[t]],":\n",sep="")
+		cm <- process.weighted.confusion.matrix(part.est[[e]],part.ref,topo.weights[[t]])
+		print(cm)
+	}
+	# pairwise comparison matrix
+	cat(" - Pairwise comparison matrix - unweighted:\n")
+	pm <- process.pairwise.matrix(part.est[[e]],part.ref)
+	print(pm)
+	# weighted pairwise comparison matrices
+	for(t in 1:length(topo.weights))
+	{	cat(" - Pairwise comparison matrix - weights=",names(topo.weights)[[t]],":\n",sep="")
+		pm <- process.pairwise.matrix(part.est[[e]],part.ref,topo.weights[[t]])
+		print(pm)
+	}
+}
+
+
+
+# print result header
+cat(sprintf("%-60s",""),"\tRefrc:Refrc\t",sep="")
+for(e in 1:length(part.est))
+	cat(names(part.est)[e],":Refrc\t",sep="")
+cat("\n")
+
+
+
+# list the traditional measures (no topological weight)
+trad.measures <- list(
 	Purity=function(p1,p2) process.purity(p1, p2, no.merge=FALSE),
 	InversePurity=function(p1,p2) process.purity(p2, p1, no.merge=FALSE),
 	NewmanPurity=function(p1,p2) process.purity(p2, p1, no.merge=TRUE),
@@ -45,39 +104,44 @@ measures <- list(
 	PercentCorrect=process.percent.correct,
 	RandIndex=function(p1,p2) compare(p1, p2, method="rand"),
 	AdjustedRandIndex=function(p1,p2) compare(p1, p2, method="adjusted.rand"),
-	NormalizedMutualInformation=function(p1,p2) compare(p1, p2, method="nmi"),
-	
-	# using degree as the topological weight
-	WeightedDegreePurity=function(p1,p2) process.topological.purity(p1, p2, topo.measure=deg, no.merge=FALSE,),
-	WeightedDegreeInversePurity=function(p1,p2) process.topological.purity(p2, p1, no.merge=FALSE),
-	WeightedDegreeMeanPurity=function(p1,p2) harmonic.mean(process.topological.purity(p1, p2, topo.measure=deg, no.merge=FALSE), process.topological.purity(p2, p1, topo.measure=deg, no.merge=FALSE)),
-	WeightedDegreeRandIndex=function(p1,p2) process.topological.rand.index(p1, p2, topo.measure=deg),
-	WeightedDegreeAdjustedRandIndex=function(p1,p2) process.topological.adjusted.rand.index(p1, p2, topo.measure=deg),
-	WeightedDegreeNormalizedMutualInformation=function(p1,p2) process.topological.NMI(p1, p2, topo.measure=deg),
-
-	# using embeddedness as the topological weight
-	WeightedDegreePurity=function(p1,p2) process.topological.purity(p1, p2, topo.measure=emb, no.merge=FALSE,),
-	WeightedDegreeInversePurity=function(p1,p2) process.topological.purity(p2, p1, no.merge=FALSE),
-	WeightedDegreeMeanPurity=function(p1,p2) harmonic.mean(process.topological.purity(p1, p2, topo.measure=emb, no.merge=FALSE), process.topological.purity(p2, p1, topo.measure=emb, no.merge=FALSE)),
-	WeightedDegreeRandIndex=function(p1,p2) process.topological.rand.index(p1, p2, topo.measure=emb),
-	WeightedDegreeAdjustedRandIndex=function(p1,p2) process.topological.adjusted.rand.index(p1, p2, topo.measure=emb),
-	WeightedDegreeNormalizedMutualInformation=function(p1,p2) process.topological.NMI(p1, p2, topo.measure=emb),
-	
-	# using degree*embeddedness as the topological weight
-	WeightedDegreePurity=function(p1,p2) process.topological.purity(p1, p2, topo.measure=deg*emb, no.merge=FALSE,),
-	WeightedDegreeInversePurity=function(p1,p2) process.topological.purity(p2, p1, no.merge=FALSE),
-	WeightedDegreeMeanPurity=function(p1,p2) harmonic.mean(process.topological.purity(p1, p2, topo.measure=deg*emb, no.merge=FALSE), process.topological.purity(p2, p1, topo.measure=deg*emb, no.merge=FALSE)),
-	WeightedDegreeRandIndex=function(p1,p2) process.topological.rand.index(p1, p2, topo.measure=deg*emb),
-	WeightedDegreeAdjustedRandIndex=function(p1,p2) process.topological.adjusted.rand.index(p1, p2, topo.measure=deg*emb),
-	WeightedDegreeNormalizedMutualInformation=function(p1,p2) process.topological.NMI(p1, p2, topo.measure=deg*emb)
+	NormalizedMutualInformation=function(p1,p2) compare(p1, p2, method="nmi")
 )
+# process them
+for(m in 1:length(trad.measures))
+{	f <- trad.measures[[m]]
+	val  <- f(part.ref, part.ref)
+	cat(sprintf("%-60s\t%.9f",
+		names(trad.measures)[m],val),sep="")
+	for(e in 1:length(part.est))
+	{	val <- f(part.est[[e]], part.ref)
+		cat(sprintf("\t%.9f",val))
+	}
+	cat("\n")
+}
 
 
-# process each measure
-for(m in 1:length(measures))
-{	f <- mesures[[m]]
-	sr  <- f(ref, ref)
-	se1 <- f(se1, ref)
-	se2 <- f(se2, ref)
-	cat(names(measures)[m],": ","ref vs. ref:",sr,"\test1 vs. ref:",se1,"\test2 vs ref:",se2,"\n",sep="")
+
+# list the measures using a topological weight
+topo.measures <- list(
+	WeightedPurity=function(p1,p2,tm) process.topological.purity(p1, p2, weights=tm, no.merge=FALSE),
+	WeightedInversePurity=function(p1,p2,tm) process.topological.purity(p2, p1, weights=tm, no.merge=FALSE),
+	WeightedMeanPurity=function(p1,p2,tm) harmonic.mean(process.topological.purity(p1, p2, weights=tm, no.merge=FALSE), process.topological.purity(p2, p1, weights=tm, no.merge=FALSE)),
+	WeightedRandIndex=function(p1,p2,tm) process.topological.rand.index(p1, p2, weights=tm),
+	WeightedAdjustedRandIndex=function(p1,p2,tm) process.topological.adjusted.rand.index(p1, p2, weights=tm),
+	WeightedNormalizedMutualInformation=function(p1,p2,tm) process.topological.NMI(p1, p2, weights=tm)
+)
+# process them
+cat("------------------------\n")
+for(m in 1:length(topo.measures))
+{	f <- topo.measures[[m]]
+	for(w in 1:length(topo.weights))
+	{	val  <- f(part.ref, part.ref, topo.weights[[w]])
+		cat(sprintf("%-60s\t%.9f",
+			paste(names(topo.measures)[m],":",names(topo.weights)[w],sep=""),val),sep="")
+		for(e in 1:length(part.est))
+		{	val <- f(part.est[[e]], part.ref, topo.weights[[w]])
+			cat(sprintf("\t%.9f",val))
+		}
+		cat("\n")
+	}
 }

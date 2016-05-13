@@ -1,0 +1,9 @@
+Reference partition:  
+            1  1  1  1  1  1  2  2  2  2
+Estimated partitions:
+-  Algo1 :  1  1  1  1  1  2  2  2  2  2
+-  Algo2 :  1  2  1  1  1  1  2  2  2  2
+-  Three :  1  1  1  2  2  2  2  3  3  3
+-  Snglt :  1  2  3  4  5  6  7  8  9 10
+-  Alli1 :  1  1  1  1  1  1  1  1  1  1
+-  Unbld :  1  1  1  1  1  1  1  1  1  2
