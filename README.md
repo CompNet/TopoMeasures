@@ -1,6 +1,6 @@
 TopoMeasures
 =======
-*Partition comparison measures modified for community detection*
+*Partition comparison measures for community detection*
 
 * Copyright 2012-16 Vincent Labatut. 
 
@@ -9,6 +9,8 @@ TopoMeasures is free software: you can redistribute it and/or modify it under th
 * Lab site: http://lia.univ-avignon.fr/
 * GitHub repo: https://github.com/CompNet/TopoMeasures
 * Contact: Vincent Labatut <vincent.labatut@univ-avignon.fr>
+
+If you use this source code, please cite reference [L'15].
 
 -----------------------------------------------------------------------
 
@@ -21,13 +23,13 @@ node set of a given graph. They are based on popular measures defined in the fie
 * Rand index and its adjusted version.
 * Normalized mutual information.
 
-The scripts provided here implements (or show how to use existing implementations of) these classic measures,
+The scripts provided here implement (or show how to use existing implementations of) these classic measures,
 and also some modified versions. Those allow to take into account some weight defined for each one of the considered elements
 (in our case: nodes). The goal here is to be able to factor the network topology in these measures, which otherwise 
 completely ignore this essential aspect of community detection (which is natural, since they were originally developped
 to assess cluster analysis results).
 
-The measures were originally implemented in 2012 and the corresponding paper was published in 2015.
+The measures were originally implemented in 2012 and the corresponding paper was published in 2015 [L'15].
 I did not publish the source code at this time, because I thought it was quite trivial to implement the measures I had proposed.
 However, in 2016 I realized a few authors cited my work and pointed at the absence of publicly available source code, 
 so I decided to clean it up and put it online. Hopefully, someone will use it! 
@@ -39,7 +41,7 @@ The organization is very simple, all the source code is in folder `src`:
 * `CommonFunctions.R`: contains some functions used to process some of the measures.
 * `NormalizedMutualInformation.R`, `PurityMeasure.R` and `RandIndex.R`: process the measures listed above, as well as their modified versions. 
 * `Example.R`: illustrates how to process the different measures, by applying them to
-			   several data, including the example from my paper. The `Example-out-xxxxx.txt``files correspond to the results you should obtain
+			   several data, including the example from my paper. The `Example-out-xxxxx.txt` files correspond to the results you should obtain
 			   when executing this script. 
 
 
@@ -49,7 +51,6 @@ You just need to install `R` and the required packages:
 1. Install the [`R` language](https://www.r-project.org/)
 2. Install the following R packages:
    * [`igraph`](http://igraph.org/r/)
-   * [`magic`](https://cran.r-project.org/web/packages/magic/index.html)
 3. Download this project from GitHub and unzip.
 4. Launch `R`, setup the working directory with `setwd` so that it points at the root of this project. 
 
@@ -64,9 +65,9 @@ In order to process the measures:
 
 
 # Extension
-The example shows how to use the measure with the three types of weights proposed in the paper [L'15].
-However, the function allow using any other scheme: you just need to process these topological weights
-first, then pass them to the function using its `topo.measure` parameter. 
+The example shows how to use the measures with the three types of weights proposed in the paper [L'15].
+However, the functions allow using any other scheme: you just need to process these topological weights
+first, then pass them to the selected function using its `topo.measure` parameter. 
 
 
 # Dependencies
