@@ -2,42 +2,7 @@ NormalizedDegree :  0.8333333 1.0000000 0.5000000 0.6666667 0.5000000 0.5000000 
 Embeddedness     :  1.0000000 0.8333333 1.0000000 1.0000000 1.0000000 0.6666667 0.7500000 0.7500000 1.0000000 1.0000000
 Product          :  0.8333333 0.8333333 0.5000000 0.6666667 0.5000000 0.3333333 0.5000000 0.5000000 0.5000000 0.5000000
 
-**************** Algo1:Refrc
- - Confusion matrix - unweighted:
-     [,1] [,2]
-[1,]  5    0
-[2,]  1    4
- - Confusion matrix - weights=NormalizedDegree:
-     [,1]     [,2]
-[1,]  3.5 0.000000
-[2,]  0.5 2.333333
- - Confusion matrix - weights=Embeddedness:
-          [,1] [,2]
-[1,] 4.8333333  0.0
-[2,] 0.6666667  3.5
- - Confusion matrix - weights=Product:
-          [,1] [,2]
-[1,] 3.3333333    0
-[2,] 0.3333333    2
- - Pairwise comparison matrix - unweighted:
-     [,1] [,2]
-[1,]   16    4
-[2,]    5   20
- - Pairwise comparison matrix - weights=NormalizedDegree:
-         [,1]     [,2]
-[1,] 6.833333 1.166667
-[2,] 1.750000 8.166667
- - Pairwise comparison matrix - weights=Embeddedness:
-          [,1]      [,2]
-[1,] 13.895833  2.333333
-[2,]  3.222222 16.916667
- - Pairwise comparison matrix - weights=Product:
-         [,1]      [,2]
-[1,] 5.888889 0.6666667
-[2,] 1.111111 6.6666667
-
-
-**************** Algo2:Refrc
+**************** AlgoA:Refrc
  - Confusion matrix - unweighted:
      [,1]  [,2]
 [1,]  5     0
@@ -70,6 +35,41 @@ Product          :  0.8333333 0.8333333 0.5000000 0.6666667 0.5000000 0.3333333 
          [,1]     [,2]
 [1,] 4.638889 1.666667
 [2,] 2.361111 5.666667
+
+
+**************** AlgoB:Refrc
+ - Confusion matrix - unweighted:
+     [,1] [,2]
+[1,]  5    0
+[2,]  1    4
+ - Confusion matrix - weights=NormalizedDegree:
+     [,1]     [,2]
+[1,]  3.5 0.000000
+[2,]  0.5 2.333333
+ - Confusion matrix - weights=Embeddedness:
+          [,1] [,2]
+[1,] 4.8333333  0.0
+[2,] 0.6666667  3.5
+ - Confusion matrix - weights=Product:
+          [,1] [,2]
+[1,] 3.3333333    0
+[2,] 0.3333333    2
+ - Pairwise comparison matrix - unweighted:
+     [,1] [,2]
+[1,]   16    4
+[2,]    5   20
+ - Pairwise comparison matrix - weights=NormalizedDegree:
+         [,1]     [,2]
+[1,] 6.833333 1.166667
+[2,] 1.750000 8.166667
+ - Pairwise comparison matrix - weights=Embeddedness:
+          [,1]      [,2]
+[1,] 13.895833  2.333333
+[2,]  3.222222 16.916667
+ - Pairwise comparison matrix - weights=Product:
+         [,1]      [,2]
+[1,] 5.888889 0.6666667
+[2,] 1.111111 6.6666667
 
 
 **************** Three:Refrc

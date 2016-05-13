@@ -20,8 +20,8 @@ source("src/RandIndex.R")
 # set up some example partitions
 part.ref <- c(1,1,1,1,1,1,2,2,2,2)		# ground truth
 part.est <- list(
-	Algo1=c(1,1,1,1,1,2,2,2,2,2),		# estimation by algorithm #1 (paper)
-	Algo2=c(1,2,1,1,1,1,2,2,2,2),		# estimation by algorithm #2 (paper)
+	AlgoA=c(1,2,1,1,1,1,2,2,2,2),		# estimation by algorithm A (paper)
+	AlgoB=c(1,1,1,1,1,2,2,2,2,2),		# estimation by algorithm B (paper)
 	Three=c(1,1,1,2,2,2,2,3,3,3),		# three parts
 	Snglt=c(1,2,3,4,5,6,7,8,9,10),		# singletons
 	Alli1=c(1,1,1,1,1,1,1,1,1,1),		# all in one
