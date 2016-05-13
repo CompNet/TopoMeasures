@@ -97,7 +97,7 @@ process.percent.correct <- function(partition1, partition2)
 ############################################################################
 process.purity <- function(partition1, partition2, no.merge=FALSE)
 {	# process the confusion matrix
-	conf.matrix <- process.confusion.matrix(partition2,partition1)
+	conf.matrix <- process.confusion.matrix(partition1,partition2)
 	
 	# init
 	total <- 0
@@ -145,7 +145,7 @@ process.purity <- function(partition1, partition2, no.merge=FALSE)
 ############################################################################
 process.topological.purity <- function(partition1, partition2, weights, no.merge=FALSE)
 {	# process the confusion matrix
-	conf.matrix <- process.weighted.confusion.matrix(partition2,partition1,weights)
+	conf.matrix <- process.weighted.confusion.matrix(partition1,partition2,weights)
 	
 	# init
 	total <- 0
