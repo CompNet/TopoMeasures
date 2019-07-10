@@ -85,4 +85,4 @@ email address or post an issue on the GitHub page.
 
 
 # Reference
- * **[L'15]** V. Labatut, *Generalised measures for the evaluation of community detection methods*, International Journal of Social Network Mining (IJSNM), 2(1):44-63, 2015. [Official version](http://www.inderscienceonline.com/doi/abs/10.1504/IJSNM.2015.069776) - [arXiv version](http://arxiv.org/abs/1303.5441) - [HAL version](https://hal.archives-ouvertes.fr/hal-00802923/).
+ * **[L'15]** V. Labatut. *Generalised measures for the evaluation of community detection methods*, International Journal of Social Network Mining (IJSNM), 2(1):44-63, 2015. [doi: 10.1504/IJSNM.2015.069776](https://doi.org/10.1504/IJSNM.2015.069776) - [⟨hal-00802923⟩](https://hal.archives-ouvertes.fr/hal-00802923)
