@@ -89,7 +89,7 @@ process.percent.correct <- function(partition1, partition2)
 # partition1: the first partition to consider, represented as an integer vector.
 #			  Each value in the vector represents the id of a part. The parts 
 #			  must be counted starting from one (not zero).
-# partition2: the second partition to consider. Same representation than for
+# partition2: the second partition to consider. Same representation as for
 #			  the first one. Both are inter-exchangeable (symmetric measure).
 # no.merge: if TRUE, applies Newman's stricter version of the measure.
 # returns: a single real value between 0 and 1 indicating the purity of the first
@@ -134,11 +134,11 @@ process.purity <- function(partition1, partition2, no.merge=FALSE)
 # partition1: the first partition to consider, represented as an integer vector.
 #			  Each value in the vector represents the id of a part. The parts 
 #			  must be counted starting from one (not zero).
-# partition2: the second partition to consider. Same representation than for
+# partition2: the second partition to consider. Same representation as for
 #			  the first one. Both are inter-exchangeable (symmetric measure).
 # no.merge: if TRUE, applies Newman's stricter version of the measure.
 # weights: numerical vector representing the topological weight associated
-#		  to each node. So, its length must be the same than vectors partition1 
+#		  to each node. So, its length must be the same as vectors partition1 
 # 		  and partition2.
 # returns: a single real value between 0 and 1 indicating the purity of the first
 #		   partition relatively to the second.
