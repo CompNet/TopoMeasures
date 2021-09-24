@@ -28,7 +28,7 @@ source("src/CommonFunctions.R")
 # partition1: the first partition to consider, represented as an integer vector.
 #			  Each value in the vector represents the id of a part. The parts 
 #			  must be counted starting from one (not zero).
-# partition2: the second partition to consider. Same representation than for
+# partition2: the second partition to consider. Same representation as for
 #			  the first one. Both are inter-exchangeable (symmetric measure).
 # returns: a single real value between 0 and 1 indicating the proportion of elements
 #		   put on the same part in both partitions.
