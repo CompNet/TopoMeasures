@@ -18,17 +18,17 @@ source("src/CommonFunctions.R")
 #		https://en.wikipedia.org/wiki/Mutual_information#Normalized_variants
 # Here, we use the version introduced by Danon et al. to the field of community
 # detection, i.e. 2I(X,Y)/(H(X)+H(Y)), as described in:
-#		Danon, L.; Díaz-Guilera, A.; Duch, J. & Arenas, A. 
+#		Danon, L.; DÃ­az-Guilera, A.; Duch, J. & Arenas, A. 
 #		Comparing Community Structure Identification 
 #		Journal of Statistical Mechanics, 9:P09008, 2005
 # 
 # partition1: the first partition to consider, represented as an integer vector.
 #			  Each value in the vector represents the id of a part. The parts 
 #			  must be counted starting from one (not zero).
-# partition2: the second partition to consider. Same representation than for
+# partition2: the second partition to consider. Same representation as for
 #			  the first one. Both are inter-exchangeable (symmetric measure).
 # weights: numerical vector representing the topological weight associated
-#		   to each node. So, its length must be the same than vectors partition1 
+#		   to each node. So, its length must be the same as vectors partition1 
 # 		   and partition2.
 # returns: a single real value between 0 and 1 corresponding to the NMI version
 #		   used in the community detection field.
