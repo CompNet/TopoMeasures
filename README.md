@@ -27,7 +27,7 @@ node set of a given graph. They are based on popular measures defined in the fie
 The scripts provided here implement (or show how to use existing implementations of) these classic measures,
 and also some modified versions. Those allow to take into account some weight defined for each one of the considered elements
 (in our case: nodes). The goal here is to be able to factor the network topology in these measures, which otherwise 
-completely ignore this essential aspect of community detection (which is natural, since they were originally developped
+completely ignore this essential aspect of community detection (which is natural, since they were originally developed
 to assess cluster analysis results).
 
 The measures were originally implemented in 2012 and the corresponding paper was published in 2015 [L'15].
