@@ -76,4 +76,4 @@ This is not the exact version used in the paper [L'15], it is a reworked, cleane
 
 
 ## References
- * **[L'15]** V. Labatut. *Generalised measures for the evaluation of community detection methods*, International Journal of Social Network Mining (IJSNM), 2(1):44-63, 2015. [doi: 10.1504/IJSNM.2015.069776](https://doi.org/10.1504/IJSNM.2015.069776) - [⟨hal-00802923⟩](https://hal.archives-ouvertes.fr/hal-00802923)
+ * **[L'15]** V. Labatut. *Generalised measures for the evaluation of community detection methods*, International Journal of Social Network Mining (IJSNM), 2(1):44-63, 2015. doi: [10.1504/IJSNM.2015.069776](https://doi.org/10.1504/IJSNM.2015.069776) - [⟨hal-00802923⟩](https://hal.archives-ouvertes.fr/hal-00802923)
